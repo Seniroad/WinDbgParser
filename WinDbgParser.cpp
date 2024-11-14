@@ -55,18 +55,18 @@ void parse_symbols(const std::string& input_filename) {
     std::string line, next_line;
 
     while (std::getline(infile, line)) {
-        line.erase(0, line.find_first_not_of(" \t"));  
+        line.erase(0, line.find_first_not_of(" \t"));
 
         if (line.rfind("Matched:", 0) == 0) {
-            continue;  
+            continue;
         }
 
-        
+
         if (line.rfind("lkd> dd ", 0) == 0 && line.find('!') != std::string::npos && std::getline(infile, next_line)) {
-            next_line.erase(0, next_line.find_first_not_of(" \t"));  
+            next_line.erase(0, next_line.find_first_not_of(" \t"));
 
             if (next_line.find("Couldn't resolve error") != std::string::npos) {
-                continue;  
+                continue;
             }
 
             size_t exclamation_pos = line.find('!');
@@ -74,7 +74,7 @@ void parse_symbols(const std::string& input_filename) {
                 std::string symbol_name = line.substr(exclamation_pos + 1);
                 symbol_name.erase(0, symbol_name.find_first_not_of(" \t"));
 
-                
+
                 if (symbol_name.size() >= 2 && symbol_name.compare(symbol_name.size() - 2, 2, "l1") == 0) {
                     symbol_name.resize(symbol_name.size() - 2);
                 }
@@ -96,7 +96,7 @@ void parse_symbols(const std::string& input_filename) {
 void compareFiles(const std::string& file1, const std::string& file2) {
     std::ifstream inputFile1(file1);
     std::ifstream inputFile2(file2);
-    std::ofstream outputFile("comparison_result.txt"); 
+    std::ofstream outputFile("comparison_result.txt");
 
     if (!inputFile1.is_open() || !inputFile2.is_open() || !outputFile.is_open()) {
         std::cerr << "Error opening one or more files!" << std::endl;
@@ -129,7 +129,7 @@ void compareFiles(const std::string& file1, const std::string& file2) {
 
         file2Data[symbol2] = value2;
     }
-    
+
     for (const auto& entry : file1Data) {
         const std::string& symbol1 = entry.first;
         const std::string& value1 = entry.second;
@@ -139,13 +139,13 @@ void compareFiles(const std::string& file1, const std::string& file2) {
             const std::string& value2 = it->second;
             if (value1 != value2) {
                 outputFile << "Symbol: " << symbol1
-                    << " | File1 Value: " << value1
-                    << " | File2 Value: " << value2 << std::endl;
+                    << " | " << file1 << " Value: " << value1
+                    << " | " << file2 << " Value: " << value2 << std::endl;
             }
         }
         else {
             outputFile << "Symbol: " << symbol1
-                << " is missing in file2" << std::endl;
+                << " is missing in " << file2 << std::endl;
         }
     }
 
@@ -153,7 +153,7 @@ void compareFiles(const std::string& file1, const std::string& file2) {
         const std::string& symbol2 = entry.first;
         if (file1Data.find(symbol2) == file1Data.end()) {
             outputFile << "Symbol: " << symbol2
-                << " is missing in file1" << std::endl;
+                << " is missing in " << file1 << std::endl;
         }
     }
     std::cout << "Symbols have been written to comparison_result.txt " << "\n";
